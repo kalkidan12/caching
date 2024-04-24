@@ -1,9 +1,12 @@
 const Product = require("../models/productModel");
-
+const redis = require("../redis/redis");
 module.exports.ProductServices = {
   createProduct: async (productData) => {
     try {
+      const cacheKey = "Products";
+
       const newProduct = await Product.create(productData);
+      await redis.appendCache(cacheKey, productData);
       return newProduct;
     } catch (error) {
       throw new Error(`Failed to create product: ${error.message}`);
@@ -12,6 +15,11 @@ module.exports.ProductServices = {
 
   getProducts: async (reqQuery) => {
     try {
+      const cacheKey = JSON.stringify(req.reqQuery); // or we can use 'Products'
+      const cacheddata = await redis.getFromCache(cacheKey);
+      if (cacheddata) {
+        return cacheddata;
+      }
       const {
         category,
         brand,
@@ -46,6 +54,7 @@ module.exports.ProductServices = {
         .sort(sort)
         .skip(skip)
         .limit(pageSize);
+      await redis.setInCache(cacheKey, products); //Each unique combination of query parameters in reqQuery could potentially result in a different set of cached data.
       return products;
     } catch (error) {
       throw new Error(`Failed to fetch products: ${error.message}`);
@@ -63,7 +72,15 @@ module.exports.ProductServices = {
 
   getProductById: async (productId) => {
     try {
+      const cacheKey = JSON.stringify(`Product:${productId}`);
+      const cacheddata = await redis.getFromCache(cacheKey);
+      if (cacheddata) {
+        return cacheddata;
+      }
+
       const product = await Product.findById(productId);
+      await redis.setInCache(`Product:${productId}`, product);
+
       return product;
     } catch (error) {
       throw new Error(`Failed to find product by ID: ${error.message}`);
@@ -77,6 +94,10 @@ module.exports.ProductServices = {
         productData,
         { new: true }
       );
+
+      const cacheKey = JSON.stringify(`Product:${productId}`);
+      await redis.removeFromCache(cacheKey);
+
       return updatedProduct;
     } catch (error) {
       throw new Error(`Failed to update product: ${error.message}`);
@@ -92,4 +113,3 @@ module.exports.ProductServices = {
     }
   },
 };
-// module.exports.ProductServices = ProductServices;
