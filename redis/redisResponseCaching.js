@@ -1,4 +1,4 @@
-const { redisClient } = require("../configs/redis");
+const { asyncGet, asyncSet } = require("../configs/redis");
 
 module.exports = {
   async getResponseFromCache(req, res, next) {
