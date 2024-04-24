@@ -1,0 +1,27 @@
+{
+  "name": "caching",
+  "version": "1.0.0",
+  "description": "- Data Types: Numbers(Integer, floats, complex numbers), Strings, Arrays, Booleans(True/False), Slice(DS that give flexible way to work with arrays), Map(Data type that containe key-value pairs)",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "ioredis": "^5.4.1",
+    "joi": "^17.12.3",
+    "mongoose": "^8.3.2",
+    "redis": "^4.6.13",
+    "winston": "^3.13.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}
